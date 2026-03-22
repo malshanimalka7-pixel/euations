@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Affordability Calculator</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  text-align: center;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+button {
+  padding: 10px 14px;
+  margin: 5px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(45deg,#3b82f6,#6366f1);
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 15px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.formula {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="graph"></canvas>
+
+<div class="container">
+  <h1>🚗 Math Car Calculator</h1>
+
+  <button onclick="setMode('car')">Car → Income</button>
+  <button onclick="setMode('income')">Income → Car</button>
+
+  <input id="input" placeholder="Car price (millions)">
+
+  <div class="formula" id="formula">y = 49000x + 105000</div>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+let mode = 'car';
+
+function setMode(m){
+  mode = m;
+  document.getElementById('input').value='';
+  document.getElementById('result').innerText='';
+
+  if(m==='car'){
+    input.placeholder='Car price (millions)';
+    formula.innerText='y = 49000x + 105000';
+  } else {
+    input.placeholder='Monthly income (Rs)';
+    formula.innerText='x = (y - 105000)/49000';
+  }
+}
+
+input.addEventListener('input',()=>{
+  let val = parseFloat(input.value);
+  if(isNaN(val)) return;
+
+  if(mode==='car'){
+    let y = 49000*val + 105000;
+    result.innerText = `💰 Rs. ${Math.round(y).toLocaleString()} / month`;
+  } else {
+    let x = (val-105000)/49000;
+    result.innerText = `🚗 Rs. ${x.toFixed(2)} Million car`;
+  }
+});
+
+// ====== GRAPH ANIMATION ======
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let t = 0;
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+
+  for(let x=0; x<canvas.width; x+=5){
+    let px = x/50;
+    let y = 49000*px + 105000;
+    let py = canvas.height - (y/10000);
+
+    let wave = Math.sin((x+t)/50)*10;
+
+    if(x===0) ctx.moveTo(x,py+wave);
+    else ctx.lineTo(x,py+wave);
+  }
+
+  ctx.stroke();
+
+  t += 1;
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
